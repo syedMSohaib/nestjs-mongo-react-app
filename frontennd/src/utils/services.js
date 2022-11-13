@@ -1,4 +1,4 @@
-const BASEURL = "http://localhost:3000/";
+const BASEURL = process.env.BACKEND_URL || "http://localhost:3000/";
 
 // User Endpoints
 export const fetchUsers = async () => {
