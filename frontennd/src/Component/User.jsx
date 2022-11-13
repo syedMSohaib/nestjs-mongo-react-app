@@ -1,10 +1,22 @@
 import React, { useEffect } from 'react'
 import { useState } from 'react'
-import { fetchUsers } from '../utils/services'
+import { createUsers, fetchUsers } from '../utils/services'
 
-export default function User() {
+export default function User({ dispatchUser }) {
   const [users, setUsers] = useState([])
+  const [name, setName] = useState('')
+  const [selected, setSelected] = useState('')
 
+  const colors = [
+    'red',
+    '2A0672',
+    'ffcc33',
+    'C9CC3F',
+    '5F8575',
+    '408080',
+    '1959A8',
+    '630330',
+  ]
   useEffect(() => {
     fetch()
   }, [])
@@ -14,20 +26,41 @@ export default function User() {
     setUsers(users)
   }
 
+  const create = async () => {
+    if (!name) {
+      alert('Please enter user name to add ')
+      return
+    }
+    const data = await createUsers(name)
+    if (data.statusCode == 200) {
+      alert('User added successfully')
+      this.fetch()
+    }
+  }
+
+  const selectUser = (id) => {
+    setSelected(id)
+    dispatchUser(id)
+  }
+
   return (
     <div className="px-8">
       <h1 className="mb-4 text-xl font-bold text-gray-700">Users</h1>
       <div className="flex flex-col bg-white max-w-sm px-6 py-4  rounded-lg shadow-md">
         <ul className="-mx-4">
-          <li className="mb-5">
+          <li className="mb-5 ">
             <div className="text-black bg-white flex items-left justify-left w-full">
               <div className="border rounded flex w-full justify-betweens">
                 <input
+                  onChange={(e) => setName(e.target.value)}
                   type="text"
                   className="w-full px-4 py-2"
                   placeholder="Enter User name (e.g. Livello)"
                 />
-                <button className="flex items-center justify-center px-4 border-l">
+                <button
+                  onClick={create}
+                  className="flex items-center justify-center px-4 border-l"
+                >
                   <svg
                     version="1.1"
                     x="0px"
@@ -66,9 +99,17 @@ export default function User() {
             </div>
           </li>
           {users.map((u, _) => (
-            <li className="flex items-center">
+            <li
+              onClick={() => selectUser(u._id)}
+              key={_}
+              className={`mb-3 p-2 ${
+                selected == u._id ? 'bg-gray-300' : 'bg-gray-100'
+              } cursor-pointer flex items-center`}
+            >
               <img
-                src="https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=731&amp;q=80"
+                src={`https://ui-avatars.com/api/?background=${
+                  colors[Math.floor(Math.random() * colors.length)]
+                }&color=fff&name=${u.name}`}
                 alt="avatar"
                 className="w-10 h-10 object-cover rounded-full mx-4"
               />
@@ -79,9 +120,6 @@ export default function User() {
                 >
                   {u.name}
                 </a>
-                <span className="text-gray-700 text-sm font-light">
-                  have 0 Hobbies
-                </span>
               </p>
             </li>
           ))}
